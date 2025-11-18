@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLANIC SAS TOOLS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Apple System Font Stack */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; border: 3px solid transparent; background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        /* Glass Effect */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Card Hover Effect */
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Utility to hide elements */
+        .d-none { display: none !important; }
+        .d-flex { display: flex !important; }
+    </style>
+</head>
+<body class="bg-[#F5F5F7] text-[#1d1d1f] selection:bg-blue-200 selection:text-blue-900">
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[200] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#F5F5F7]">
+        <!-- Background Gradients -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-200/30 rounded-full blur-[100px]"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-200/30 rounded-full blur-[100px]"></div>
+        </div>
+        
+        <div class="relative z-50 w-full max-w-[360px] p-8 glass-panel rounded-3xl mx-4 shadow-2xl ring-1 ring-black/5">
+            <div class="text-center mb-8">
+                <!-- Removed Branding Icon -->
+                <h1 class="text-xl font-semibold tracking-tight text-[#1d1d1f]">PLANIC SAS TOOLS</h1>
+                <p class="text-[#86868b] mt-1 text-sm">Authorized Access Only</p>
+            </div>
+
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <input type="password" id="password-input" 
+                        class="w-full bg-gray-50 border border-gray-200 text-[#1d1d1f] text-[15px] rounded-xl focus:ring-2 focus:ring-[#0071e3] focus:bg-white focus:border-transparent block p-3 placeholder-[#86868b] transition-all outline-none text-center" 
+                        placeholder="Enter password" required>
+                </div>
+                <button type="submit" 
+                    class="w-full text-white bg-[#0071e3] hover:bg-[#0077ed] active:scale-[0.98] font-medium rounded-xl text-[15px] px-5 py-3 text-center transition-all shadow-md shadow-blue-500/20">
+                    Unlock
+                </button>
+            </form>
+            <!-- Removed Password Hint Text -->
+        </div>
+    </div>
+
+    <!-- DASHBOARD CONTENT (Initially Hidden) -->
+    <div id="dashboard" class="d-none min-h-screen flex-col relative z-0">
+        
+        <!-- Navbar -->
+        <nav class="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-200/80">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="flex justify-between h-[64px] items-center">
+                    <div class="flex items-center gap-3">
+                        <!-- Removed Branding Icon -->
+                        <div class="flex items-center">
+                            <span class="font-semibold text-base tracking-tight text-[#1d1d1f]">PLANIC SAS TOOLS</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span id="clock" class="hidden sm:block text-xs font-medium text-[#86868b] tabular-nums"></span>
+                        <button id="logout-btn" class="text-xs font-medium text-[#1d1d1f] hover:text-[#0071e3] bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition-colors">
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow p-4 sm:p-8 max-w-5xl mx-auto w-full flex flex-col">
+            
+            <!-- Header area -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                <div>
+                    <h2 class="text-3xl font-semibold text-[#1d1d1f] tracking-tight">Apps</h2>
+                    <p class="text-[#86868b] mt-1 text-sm">Access your <span id="link-count" class="text-[#1d1d1f] font-medium">4</span> secure tools.</p>
+                </div>
+                <div class="relative w-full md:w-80">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b] text-sm"></i>
+                    <input type="text" id="search-input" 
+                        class="block w-full py-2.5 pl-9 pr-4 text-sm text-[#1d1d1f] border border-gray-200 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-[#0071e3] focus:border-transparent outline-none transition-all" 
+                        placeholder="Search...">
+                </div>
+            </div>
+
+            <!-- Filter Tags -->
+            <div class="flex flex-wrap gap-2 mb-8" id="category-filters">
+                <button class="filter-btn active px-4 py-1.5 rounded-full text-xs font-medium bg-[#1d1d1f] text-white shadow-sm transition-all" data-category="all">All</button>
+                <button class="filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-white text-[#1d1d1f] border border-gray-200 hover:bg-gray-50 shadow-sm transition-all" data-category="agent">Agents</button>
+                <button class="filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-white text-[#1d1d1f] border border-gray-200 hover:bg-gray-50 shadow-sm transition-all" data-category="design">Design</button>
+                <button class="filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-white text-[#1d1d1f] border border-gray-200 hover:bg-gray-50 shadow-sm transition-all" data-category="planning">Planning</button>
+                <button class="filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-white text-[#1d1d1f] border border-gray-200 hover:bg-gray-50 shadow-sm transition-all" data-category="data">Database</button>
+            </div>
+
+            <!-- STRICT 2x2 GRID -->
+            <div id="links-grid" class="grid grid-cols-2 gap-4 sm:gap-6">
+                <!-- Content injected by JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden py-16 text-center w-full">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                    <i class="fas fa-search text-gray-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-[#1d1d1f]">No results</h3>
+                <p class="text-[#86868b] text-sm mt-1">Try a different search term.</p>
+            </div>
+
+        </main>
+
+        <footer class="border-t border-gray-200 bg-[#F5F5F7] mt-auto py-6">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <p class="text-[#86868b] text-xs">&copy; 2025 PLANIC SAS TOOLS. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const PASSWORD = "admin123"; 
+        
+        // --- APP DATA ---
+        const linksData = [
+            { 
+                name: "SAS Client Agent", 
+                url: "https://planic-design-sas-354764024795.us-west1.run.app/", 
+                icon: "fa-user-shield", 
+                category: "agent", 
+                color: "text-[#0071e3]", 
+                bg: "bg-blue-50" 
+            },
+            { 
+                name: "SAS Conceptual Designer", 
+                url: "https://sas-concept-designer-1-354764024795.us-west1.run.app/", 
+                icon: "fa-pen-nib", 
+                category: "design", 
+                color: "text-[#AF52DE]", 
+                bg: "bg-purple-50" 
+            },
+            { 
+                name: "SAS Plan Builder", 
+                url: "https://sas-plan-builder-354764024795.us-west1.run.app/", 
+                icon: "fa-diagram-project", 
+                category: "planning", 
+                color: "text-[#FF9500]", 
+                bg: "bg-orange-50" 
+            },
+            { 
+                name: "SAS Visualizer", 
+                url: "https://planic-sas-visualizer-354764024795.us-west1.run.app/", 
+                icon: "fa-eye", 
+                category: "design", 
+                color: "text-[#FF2D55]", 
+                bg: "bg-pink-50" 
+            },
+            { 
+                name: "SAS Database", 
+                url: "https://www.notion.so/PLANIC-SAS-PROJECTS-2af7e3d455c180ccaaf1ca60a35ad11f?source=copy_link", 
+                icon: "fa-database", 
+                category: "data", 
+                color: "text-[#34C759]", 
+                bg: "bg-green-50" 
+            }
+        ];
+
+        // --- DOM REFERENCES ---
+        const els = {
+            loginScreen: document.getElementById('login-screen'),
+            dashboard: document.getElementById('dashboard'),
+            loginForm: document.getElementById('login-form'),
+            passwordInput: document.getElementById('password-input'),
+            linksGrid: document.getElementById('links-grid'),
+            searchInput: document.getElementById('search-input'),
+            emptyState: document.getElementById('empty-state'),
+            filterBtns: document.querySelectorAll('.filter-btn'),
+            linkCount: document.getElementById('link-count'),
+            logoutBtn: document.getElementById('logout-btn'),
+            clock: document.getElementById('clock')
+        };
+
+        let currentCategory = 'all';
+
+        // --- MAIN LOGIC ---
+        function init() {
+            // Initial Render
+            renderLinks(linksData);
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // Event Listeners
+            if (els.loginForm) {
+                els.loginForm.addEventListener('submit', handleLogin);
+            }
+            if (els.searchInput) {
+                els.searchInput.addEventListener('input', filterLinks);
+            }
+            if (els.logoutBtn) {
+                els.logoutBtn.addEventListener('click', () => location.reload());
+            }
+            els.filterBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => handleFilterClick(e.target));
+            });
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            if (els.passwordInput.value === PASSWORD) {
+                els.loginScreen.classList.add('d-none');
+                els.dashboard.classList.remove('d-none');
+                els.dashboard.classList.add('d-flex');
+                showToast("Welcome back", "success");
+            } else {
+                els.passwordInput.value = '';
+                els.passwordInput.parentElement.classList.add('animate-pulse'); // Simple shake feedback
+                setTimeout(() => els.passwordInput.parentElement.classList.remove('animate-pulse'), 500);
+                showToast("Incorrect password", "error");
+            }
+        }
+
+        function renderLinks(data) {
+            if (!els.linksGrid) return;
+            
+            els.linksGrid.innerHTML = '';
+            
+            if (data.length === 0) {
+                els.linksGrid.classList.add('d-none');
+                els.emptyState.classList.remove('hidden');
+            } else {
+                els.linksGrid.classList.remove('d-none');
+                els.emptyState.classList.add('hidden');
+                
+                data.forEach(link => {
+                    const card = document.createElement('a');
+                    card.href = link.url;
+                    card.target = "_blank";
+                    // Strict 2x2 grid styling
+                    card.className = "bg-white rounded-2xl p-6 card-hover group flex flex-col items-center justify-center text-center shadow-sm border border-gray-100 h-48 md:h-56 w-full";
+                    
+                    card.innerHTML = `
+                        <div class="w-16 h-16 rounded-2xl ${link.bg} flex items-center justify-center mb-4 transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas ${link.icon} text-2xl ${link.color}"></i>
+                        </div>
+                        <h3 class="font-semibold text-base text-[#1d1d1f] leading-tight">${link.name}</h3>
+                        <span class="text-[10px] text-[#86868b] uppercase tracking-wide font-medium mt-1">Open App</span>
+                    `;
+                    els.linksGrid.appendChild(card);
+                });
+            }
+            if(els.linkCount) els.linkCount.innerText = data.length;
+        }
+
+        function filterLinks() {
+            const query = els.searchInput.value.toLowerCase();
+            const filtered = linksData.filter(link => {
+                const matchesSearch = link.name.toLowerCase().includes(query) || link.category.toLowerCase().includes(query);
+                const matchesCategory = currentCategory === 'all' || link.category === currentCategory;
+                return matchesSearch && matchesCategory;
+            });
+            renderLinks(filtered);
+        }
+
+        function handleFilterClick(clickedBtn) {
+            els.filterBtns.forEach(btn => {
+                btn.classList.remove('bg-[#1d1d1f]', 'text-white');
+                btn.classList.add('bg-white', 'text-[#1d1d1f]');
+            });
+            clickedBtn.classList.remove('bg-white', 'text-[#1d1d1f]');
+            clickedBtn.classList.add('bg-[#1d1d1f]', 'text-white');
+            
+            currentCategory = clickedBtn.dataset.category;
+            filterLinks();
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            const bg = type === "error" ? "bg-red-500" : "bg-[#34C759]";
+            toast.className = `${bg} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm font-medium pointer-events-auto animate-[bounce_0.5s_ease-in-out]`;
+            toast.innerHTML = `<i class="fas ${type === "error" ? "fa-times" : "fa-check"}"></i> ${message}`;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function updateClock() {
+            if(els.clock) els.clock.innerText = new Date().toLocaleTimeString('en-US', { hour12: false });
+        }
+
+        // Start
+        init();
+
+    </script>
+</body>
+</html>
